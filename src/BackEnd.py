@@ -34,8 +34,7 @@ class Application(QMainWindow):
         self.MainUi.SampConrolDTScale.valueChanged.connect(self.SampConrolDTScaleCMD)
         self.MainUi.SampControlQScale.valueChanged.connect(self.SampControlQScaleCMD)
 
-        self.Set_Channel1MsSliderValue(10e3)
-
+        self.Set_SigGenFreqSliderValue((50000))
 
 
 #*****************CALL BACK FUNCTIONS*******************#
@@ -110,16 +109,30 @@ class Application(QMainWindow):
 
 ######## Slider Command CallBack Methods
     def Channel1VoltsSliderCMD(self):
-        print(self.Get_Channel1VoltsSliderValue)
+        val = self.Get_Channel1VoltsSliderValue
 
+        if(val<1e3):
+            pass
+        elif(val>=1e3):
+            val = val / 1e3
+        
+        print(val)
+        
     def Channel1MsSliderCMD(self):
 
-        print(self.Get_Channel1MsSliderValue)
-    
-    def SigGenFreqSliderCMD(self):
-        val = self.MainUi.SigGenFreqSlider.value()
+        val = self.Get_Channel1MsSliderValue
+
+        if (val<1e3):
+            pass
+        elif (val>=1e3) and (val<1e6):
+            val = val / 1e3
+        elif (val>=1e6):
+            val = val / 1e6
 
         print(val)
+    
+    def SigGenFreqSliderCMD(self):
+        print(self.Get_SigGenFreqSliderValue)
 
     def SigGenPeriodSliderCMD(self):
         val = self.MainUi.SigGenPeriodSlider.value()
@@ -151,12 +164,12 @@ class Application(QMainWindow):
         """
         convertion calculations
         """
-        if (val<=25):
-            val = _map(val, 0, 25, 20, 1e3)
-        elif (val>25) and (val<=75):
-            val = _map(val, 26, 75, (1e3+1), 1e6)
-        elif (val>75):
-            val = _map(val, 76, 100, (1e6+1), 20e6)
+        if (val<50):
+            val = _map(val, 0, 49, 20, (1e3-1))
+        elif (val>=50) and (val<175):
+            val = _map(val, 50, 174, 1e3, (1e6-1))
+        elif (val>=175):
+            val = _map(val, 175, 200, 1e6, 20e6)
 
         return val
     
@@ -164,12 +177,12 @@ class Application(QMainWindow):
         """
         convertion calculations
         """
-        if (val<=20):
-            val = _map(val, 20, 1e3, 0, 25)
-        elif (val>1e3) and (val<=1e6):
-            val = _map(val, (1e3+1), 1e6, 26, 75)
-        elif (val>1e6):
-            val = _map(val, (1e6+1), 20e6, 76, 100)
+        if (val<1e3):
+            val = _map(val, 20, (1e3-1), 0, 49)
+        elif (val>=1e3) and (val<1e6):
+            val = _map(val, 1e3, (1e6-1), 50, 174)
+        elif (val>=1e6):
+            val = _map(val, 1e6, 20e6, 175, 200)
 
         self.MainUi.Channel1MsSlider.setValue(val)
 #### Channel1VoltsSlider
@@ -179,20 +192,55 @@ class Application(QMainWindow):
         """
         convertion calculations
         """
+        if (val<65):
+            val = _map(val, 0, 64, 10, (1e3-1))
+        elif (val>=65):
+            val = _map(val, 65, 100, 1e3, 20e3)
+
         return val
     
     def Set_Channel1VoltsSliderValue(self, val):
         """
         convertion calculations
         """
+        if (val<1e3):
+            val = _map(val, 10, (1e3-1), 0, 64)
+        elif (val>=1e3):
+            val = _map(val, 1e3, 20e3, 65, 100)
         self.MainUi.Channel1VoltsSlider.setValue(val)
+#### SigGenFreqSlider
+    @property
+    def Get_SigGenFreqSliderValue(self):
+        val = self.MainUi.SigGenFreqSlider.value()
+        """
+        convertion calculations
+        """
+        if (val<1):
+            val = _map(val, 0, 15, 125, (1e3-1))
+        elif (val>=1) and (val<1e3):
+            val = _map(val, 50, 174, 1e3, (1e6-1))
+        elif (val>=1e3):
+            val = _map(val, 175, 200, 1e6, 20e6)
+
+        
+
+        return val
+    
+    def Set_SigGenFreqSliderValue(self, val):
+        """
+        convertion calculations
+        """
+        if (val<1e3):
+            val = _map(val, 125, (1e3-1), 0, 84)
+        elif (val>=1e3):
+            val = _map(val, 1e3, 10e3, 85, 100)
+
+        self.MainUi.SigGenFreqSlider.setValue(val)
 
 
 #@@@@@@@@@@@@ END OF SLIDER VALUE METHODS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#
 
     
-
-
 
 
 

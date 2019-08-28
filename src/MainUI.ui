@@ -35,9 +35,9 @@
    <widget class="QGroupBox" name="groupBox_6">
     <property name="geometry">
      <rect>
-      <x>850</x>
+      <x>860</x>
       <y>630</y>
-      <width>191</width>
+      <width>181</width>
       <height>131</height>
      </rect>
     </property>
@@ -337,6 +337,12 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksAbove</enum>
+         </property>
+         <property name="tickInterval">
+          <number>10</number>
+         </property>
         </widget>
        </item>
        <item>
@@ -371,7 +377,7 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>200</number>
          </property>
          <property name="pageStep">
           <number>10</number>
@@ -381,6 +387,12 @@
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>10</number>
          </property>
         </widget>
        </item>
@@ -427,6 +439,12 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>10</number>
+         </property>
         </widget>
        </item>
        <item>
@@ -464,10 +482,16 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>200</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>10</number>
          </property>
         </widget>
        </item>
@@ -498,6 +522,12 @@
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>10</number>
          </property>
         </widget>
        </item>
@@ -552,9 +582,9 @@
    <widget class="QGroupBox" name="Channel1Check">
     <property name="geometry">
      <rect>
-      <x>650</x>
+      <x>640</x>
       <y>630</y>
-      <width>190</width>
+      <width>221</width>
       <height>131</height>
      </rect>
     </property>
@@ -581,9 +611,9 @@
     <widget class="QWidget" name="horizontalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>3</x>
+       <x>5</x>
        <y>20</y>
-       <width>183</width>
+       <width>211</width>
        <height>31</height>
       </rect>
      </property>
@@ -598,7 +628,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>5</width>
+          <width>2</width>
           <height>20</height>
          </size>
         </property>
@@ -614,7 +644,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>100</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -632,6 +662,12 @@
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksBelow</enum>
+        </property>
+        <property name="tickInterval">
+         <number>10</number>
         </property>
        </widget>
       </item>
@@ -669,13 +705,16 @@
     <widget class="QWidget" name="horizontalLayoutWidget_2">
      <property name="geometry">
       <rect>
-       <x>3</x>
+       <x>0</x>
        <y>50</y>
-       <width>184</width>
+       <width>231</width>
        <height>31</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>2</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -686,7 +725,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>5</width>
+          <width>2</width>
           <height>20</height>
          </size>
         </property>
@@ -702,7 +741,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>100</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -710,7 +749,7 @@
          <number>0</number>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>200</number>
         </property>
         <property name="pageStep">
          <number>1</number>
@@ -721,16 +760,25 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksBelow</enum>
+        </property>
+        <property name="tickInterval">
+         <number>10</number>
+        </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_10">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>2</width>
           <height>20</height>
          </size>
         </property>
@@ -739,16 +787,16 @@
       <item>
        <widget class="QLabel" name="Channel1MsLabel">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>10.0 ms/Div</string>
+         <string>900.0 ms/Div</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignHCenter|Qt::AlignTop</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
@@ -757,7 +805,7 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>20</x>
        <y>90</y>
        <width>181</width>
        <height>40</height>
