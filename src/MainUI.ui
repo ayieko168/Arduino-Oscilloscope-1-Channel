@@ -36,7 +36,7 @@
     <property name="geometry">
      <rect>
       <x>850</x>
-      <y>620</y>
+      <y>630</y>
       <width>191</width>
       <height>131</height>
      </rect>
@@ -151,8 +151,8 @@
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>680</y>
+      <x>10</x>
+      <y>690</y>
       <width>210</width>
       <height>70</height>
      </rect>
@@ -249,8 +249,8 @@
    <widget class="QGroupBox" name="MeterCheck">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>620</y>
+      <x>10</x>
+      <y>630</y>
       <width>201</width>
       <height>51</height>
      </rect>
@@ -290,8 +290,8 @@
    <widget class="QGroupBox" name="SignelGenCheck">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>620</y>
+      <x>220</x>
+      <y>630</y>
       <width>191</width>
       <height>131</height>
      </rect>
@@ -323,16 +323,16 @@
           </size>
          </property>
          <property name="minimum">
-          <number>125</number>
+          <number>0</number>
          </property>
          <property name="maximum">
-          <number>10000</number>
+          <number>100</number>
          </property>
          <property name="pageStep">
           <number>1</number>
          </property>
          <property name="value">
-          <number>125</number>
+          <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -368,16 +368,16 @@
           </size>
          </property>
          <property name="minimum">
-          <number>100</number>
+          <number>0</number>
          </property>
          <property name="maximum">
-          <number>8000000</number>
+          <number>100</number>
          </property>
          <property name="pageStep">
           <number>10</number>
          </property>
          <property name="value">
-          <number>20000</number>
+          <number>100</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -447,7 +447,7 @@
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>622</y>
+      <y>630</y>
       <width>231</width>
       <height>131</height>
      </rect>
@@ -461,7 +461,7 @@
        <item>
         <widget class="QSlider" name="SampConrolDTScale">
          <property name="minimum">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="maximum">
           <number>100</number>
@@ -553,7 +553,7 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>620</y>
+      <y>630</y>
       <width>190</width>
       <height>131</height>
      </rect>
@@ -757,10 +757,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>5</x>
        <y>90</y>
-       <width>156</width>
-       <height>36</height>
+       <width>181</width>
+       <height>40</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout" rowstretch="0">
@@ -789,7 +789,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
+          <width>60</width>
           <height>30</height>
          </size>
         </property>
