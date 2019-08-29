@@ -303,7 +303,7 @@
      <bool>true</bool>
     </property>
     <property name="checked">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
@@ -326,7 +326,10 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>500</number>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
          </property>
          <property name="pageStep">
           <number>1</number>
@@ -380,7 +383,7 @@
           <number>200</number>
          </property>
          <property name="pageStep">
-          <number>10</number>
+          <number>1</number>
          </property>
          <property name="value">
           <number>100</number>
@@ -478,11 +481,26 @@
       <layout class="QHBoxLayout" name="horizontalLayout_12">
        <item>
         <widget class="QSlider" name="SampConrolDTScale">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="minimum">
           <number>0</number>
          </property>
          <property name="maximum">
           <number>200</number>
+         </property>
+         <property name="pageStep">
+          <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -511,11 +529,26 @@
       <layout class="QHBoxLayout" name="horizontalLayout_13">
        <item>
         <widget class="QSlider" name="SampControlQScale">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>160</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="minimum">
           <number>1</number>
          </property>
          <property name="maximum">
           <number>100</number>
+         </property>
+         <property name="pageStep">
+          <number>1</number>
          </property>
          <property name="value">
           <number>100</number>
