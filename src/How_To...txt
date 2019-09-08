@@ -1,0 +1,2 @@
+1. How to change the cursor in qt also Applies for pyqtgraph
+    -W.setCursor(QCursor(QtCore.Qt.PointingHandCursor)))
