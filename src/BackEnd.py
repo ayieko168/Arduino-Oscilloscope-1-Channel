@@ -84,52 +84,66 @@ class Application(QMainWindow):
         self.MainUi.ConfSerBaoudRateCombo.addItems(_BAUDRATES)
         self.MainUi.ConfSerComPortCombo.addItems([""] + _COMPORTs)
         self.MainUi.ConfSerBaoudRateCombo.setCurrentIndex(8)
+        ############ Serial Setup ########################
+        self.ser = serial.Serial(timeout=1)  #initiate a serial but not connect yet
+        #### Update Timer Setting Up and Start Graphing
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.GrapgUpdateFunc)
 
         ############ Graph SetUp #################################
-        graphView = self.MainUi.graphicsView
-        graphView.setBackground("k")
-        graphView.setMouseEnabled(False, False)
-        #### Update Timer Setting Up
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.readSerial)
-
-        self.timerGraph = QtCore.QTimer()
-        self.timerGraph.timeout.connect(self.GrapgUpdateFunc)
-        'self.timer.start(10)'
-
-        ############ Serial Setup ########################
-        self.ser = serial.Serial(timeout=1)
+        self.graphView = self.MainUi.graphicsView
+        self.graphView.setBackground("k")
+        self.graphView.setMouseEnabled(False, False)
+        
 
         # self.graphObject = graphView.plot(pen=None, symbol='o')
 
         # win = pg.GraphicsWindow(title="Signal from serial port")  # creates a window
         # p = graphView.addPlot(title="Realtime plot")  # creates empty space for the plot in the window
 
-        curve = graphView.plot()  # create an empty "plot" (a curve to plot)
-        windowWidth = 500  # width of the window displaying the curve
-        Xm = linspace(0, 0, windowWidth)  # create array that will contain the relevant time series
-        ptr = -windowWidth
+        # curve = graphView.plot()  # create an empty "plot" (a curve to plot)
+        # windowWidth = 500  # width of the window displaying the curve
+        # Xm = linspace(0, 0, windowWidth)  # create array that will contain the relevant time series
+        # ptr = -windowWidth
 
-        curve2 = graphView.plot()
-        windowWidth2 = 500  # width of the window displaying the curve
-        Xm2 = linspace(0, 0, windowWidth2)  # create array that will contain the relevant time series
-        ptr2 = -windowWidth
+        # curve2 = graphView.plot()
+        # windowWidth2 = 500  # width of the window displaying the curve
+        # Xm2 = linspace(0, 0, windowWidth2)  # create array that will contain the relevant time series
+        # ptr2 = -windowWidth
 
+        self.datax = []
     def GrapgUpdateFunc(self):
 
         # print(self.xs, self.ys)
-
         # x = np.random.normal(size=1000)
         # y = np.arange(1000)
         # self.graphObject
-        global curve, ptr, Xm
-        Xm[:-1] = Xm[1:]  # shift data in the temporal mean 1 sample left
-        value = self.readData  # read line (single value) from the serial port
-        Xm[-1] = float(value)  # vector containing the instantaneous values
-        ptr += 1  # update x position for displaying the curve
-        curve.setData(Xm)  # set the curve with this data
-        curve.setPos(ptr, 0)  # set x position in the graph to 0
+        # global curve, ptr, Xm
+        # Xm[:-1] = Xm[1:]  # shift data in the temporal mean 1 sample left
+        # value = self.readData  # read line (single value) from the serial port
+        # Xm[-1] = float(value)  # vector containing the instantaneous values
+        # ptr += 1  # update x position for displaying the curve
+        # curve.setData(Xm)  # set the curve with this data
+        # curve.setPos(ptr, 0)  # set x position in the graph to 0
         # QtGui.QApplication.processEvents()
+
+        dat = self.readSerial()
+        print(dat)
+        if type(dat) == int:
+            if len(self.datax) >= 90:
+                self.datax = []
+            else:
+                self.datax.append(dat)
+            # print(self.datax)
+            self.datos2 = self.graphView.plot(pen="y")
+            self.datos2.setData(self.datax)
+            # self.graphView.setLimits(xMax=100, xMin=0)
+        else:
+            pass
+
+
+
+        # print("update graph")
 
     # *****************CALL BACK FUNCTIONS*******************#
     ######## Button Command CallBack Methods
@@ -156,9 +170,10 @@ class Application(QMainWindow):
             self.ser.baudrate = self.Baudrate
             self.ser.port = self.Port
             self.ser.open()
-            self.timer.start(0)
+            self.timer.start(4e-3)
             print(self.ser)
 
+        
             # self.timerGraph = QtCore.QTimer()
             # self.timerGraph.singleShot(3000, lambda: self.wrireSerail("vo"))
             # self.timer.start()
@@ -597,32 +612,22 @@ class Application(QMainWindow):
             # data = data.decode("utf-8", errors='replace')
             data = data.decode("utf-8", errors='replace')
 
-            print("data = ", data)
+            # print("data = ", data)
             try:
                 self.readData = int(data)
             except:
                 self.readData = data
 
-            self.GrapgUpdateFunc()
+            # self.GrapgUpdateFunc()
 
-            # if data.startswith(">f=0"):
-            #     "['>f=0', '4e-3', '87', '82', '79', '83\r\n']"
-            #
-            #     self.ch1Data = int(data.split("\t")[2])
-            #
-            #     if self.y == 100:
-            #         self.y = 0
-            #     elif self.y < 100:
-            #         self.y+=1
-            #         self.ys.append(self.y)
-            #
-            #     if len(self.xs) >= 100:
-            #         self.xs.clear()
-            #     else:
-            #         self.xs.append(self.ch1Data)
-            #
-            #     if (len(self.ys) == 99) and (len(self.xs) == 99):
-            #         self.GrapgUpdateFunc()
+            if data.startswith(">f=0"):
+                "['>f=0', '4e-3', '87', '82', '79', '83\r\n']"
+            
+                self.ch1Data = int(data.split("\t")[2])
+            else:
+                self.ch1Data = None
+
+            return self.ch1Data
 
     def wrireSerail(self, data):
 
