@@ -1,6 +1,6 @@
 # Main Imports
-from PyQt4.QtGui import *
-from PyQt4 import QtCore
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 try:
     from src.MainUI import *
