@@ -2,9 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2fb6e0b8-f197-4e0e-84fd-dc1dd8306f6c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/perser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Arduino-Oscilloscope-1-Channel.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Arduino-Oscilloscope-1-Channel.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/src.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BackEnd.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/BackEnd.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MainUI.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/serialPorts.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/serialPorts.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,18 +37,21 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1VieCW0FigfkkvMwsLABsEoaCoS" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/BackEnd.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.BackEnd">
     <configuration name="BackEnd" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Arduino-Oscilloscope-1-Channel" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -46,9 +59,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\royal state\AppData\Local\Programs\Python\Python37\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -83,18 +96,85 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Arduino-Oscilloscope-1-Channel" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\royal state\AppData\Local\Programs\Python\Python37\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="parser" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Arduino-Oscilloscope-1-Channel" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/perser.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="serialPorts" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Arduino-Oscilloscope-1-Channel" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\royal state\AppData\Local\Programs\Python\Python37\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/serialPorts.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.BackEnd" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.parser" />
+      <item itemvalue="Python.serialPorts" />
+    </list>
+    <recent_temporary>
       <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
+        <item itemvalue="Python.parser" />
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.serialPorts" />
       </list>
-    </option>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -114,24 +194,80 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1236" height="258" key="GridCell.Tab.0.bottom" timestamp="1577740407235">
-      <screen x="0" y="0" width="1280" height="984" />
+    <state x="235" y="164" width="800" height="677" key="#Notifications" timestamp="1586099027449">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="235" y="164" width="800" height="677" key="#Notifications/0.27.1280.954@0.27.1280.954" timestamp="1586099027449" />
+    <state x="98" y="161" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586098227308">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="98" y="161" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1280.954@0.27.1280.954" timestamp="1586098227308" />
+    <state x="343" y="308" width="584" height="390" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1586282742865">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="343" y="308" width="584" height="390" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1280.954@0.27.1280.954" timestamp="1586282742865" />
+    <state x="314" y="122" width="642" height="761" key="#main" timestamp="1586282695079">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="314" y="122" width="642" height="761" key="#main/0.27.1280.954@0.27.1280.954" timestamp="1586282695079" />
+    <state x="423" y="261" width="424" height="484" key="FileChooserDialogImpl" timestamp="1586097746754">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="423" y="261" width="424" height="484" key="FileChooserDialogImpl/0.27.1280.954@0.27.1280.954" timestamp="1586097746754" />
+    <state width="1257" height="217" key="GridCell.Tab.0.bottom" timestamp="1586342864197">
+      <screen x="0" y="27" width="1280" height="954" />
     </state>
     <state width="1236" height="258" key="GridCell.Tab.0.bottom/0.0.1280.984@0.0.1280.984" timestamp="1577740407235" />
-    <state width="1236" height="258" key="GridCell.Tab.0.center" timestamp="1577740407235">
-      <screen x="0" y="0" width="1280" height="984" />
+    <state width="1257" height="217" key="GridCell.Tab.0.bottom/0.27.1280.954@0.27.1280.954" timestamp="1586342864197" />
+    <state width="1257" height="217" key="GridCell.Tab.0.center" timestamp="1586342864197">
+      <screen x="0" y="27" width="1280" height="954" />
     </state>
     <state width="1236" height="258" key="GridCell.Tab.0.center/0.0.1280.984@0.0.1280.984" timestamp="1577740407235" />
-    <state width="1236" height="258" key="GridCell.Tab.0.left" timestamp="1577740407235">
-      <screen x="0" y="0" width="1280" height="984" />
+    <state width="1257" height="217" key="GridCell.Tab.0.center/0.27.1280.954@0.27.1280.954" timestamp="1586342864197" />
+    <state width="1257" height="217" key="GridCell.Tab.0.left" timestamp="1586342864197">
+      <screen x="0" y="27" width="1280" height="954" />
     </state>
     <state width="1236" height="258" key="GridCell.Tab.0.left/0.0.1280.984@0.0.1280.984" timestamp="1577740407235" />
-    <state width="1236" height="258" key="GridCell.Tab.0.right" timestamp="1577740407235">
-      <screen x="0" y="0" width="1280" height="984" />
+    <state width="1257" height="217" key="GridCell.Tab.0.left/0.27.1280.954@0.27.1280.954" timestamp="1586342864197" />
+    <state width="1257" height="217" key="GridCell.Tab.0.right" timestamp="1586342864197">
+      <screen x="0" y="27" width="1280" height="954" />
     </state>
     <state width="1236" height="258" key="GridCell.Tab.0.right/0.0.1280.984@0.0.1280.984" timestamp="1577740407235" />
+    <state width="1257" height="217" key="GridCell.Tab.0.right/0.27.1280.954@0.27.1280.954" timestamp="1586342864197" />
+    <state width="1257" height="304" key="GridCell.Tab.1.bottom" timestamp="1586289331155">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state width="1257" height="304" key="GridCell.Tab.1.bottom/0.27.1280.954@0.27.1280.954" timestamp="1586289331155" />
+    <state width="1257" height="304" key="GridCell.Tab.1.center" timestamp="1586289331154">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state width="1257" height="304" key="GridCell.Tab.1.center/0.27.1280.954@0.27.1280.954" timestamp="1586289331154" />
+    <state width="1257" height="304" key="GridCell.Tab.1.left" timestamp="1586289331154">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state width="1257" height="304" key="GridCell.Tab.1.left/0.27.1280.954@0.27.1280.954" timestamp="1586289331154" />
+    <state width="1257" height="304" key="GridCell.Tab.1.right" timestamp="1586289331154">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state width="1257" height="304" key="GridCell.Tab.1.right/0.27.1280.954@0.27.1280.954" timestamp="1586289331154" />
+    <state x="141" y="148" key="SettingsEditor" timestamp="1586128376543">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="141" y="148" key="SettingsEditor/0.27.1280.954@0.27.1280.954" timestamp="1586128376543" />
+    <state x="296" y="331" key="com.intellij.ide.util.TipDialog" timestamp="1586093193996">
+      <screen x="0" y="27" width="1280" height="954" />
+    </state>
+    <state x="296" y="331" key="com.intellij.ide.util.TipDialog/0.27.1280.954@0.27.1280.954" timestamp="1586093193996" />
   </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Arduino_Oscilloscope_1_Channel$BackEnd.coverage" NAME="BackEnd Coverage Results" MODIFIED="1577740342572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

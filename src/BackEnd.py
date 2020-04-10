@@ -1,12 +1,13 @@
 # Main Imports
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-
+import collections
 try:
     from src.MainUI import *
 except:
     from MainUI import *
-from numpy import *
+import numpy as np
+from math import sin, cos
 import serial
 
 try:
@@ -93,60 +94,89 @@ class Application(QMainWindow):
         ############ Graph SetUp #################################
         self.graphView = self.MainUi.graphicsView
         self.graphView.setBackground("k")
-        self.graphView.setMouseEnabled(False, False)
-        
+        # self.graphView.setMouseEnabled(False, False)
 
-        # self.graphObject = graphView.plot(pen=None, symbol='o')
+        self.x = [x for x in range(1, 100)]
+        self.y = [sin(x)*6 for x in range(1, 100)]
 
-        # win = pg.GraphicsWindow(title="Signal from serial port")  # creates a window
-        # p = graphView.addPlot(title="Realtime plot")  # creates empty space for the plot in the window
+        # PyQtGraph settings
+        self.graphView.showGrid(x=True, y=True)
+        self.graphView.setLabel('left', 'amplitude', 'uV')
+        self.graphView.setLabel('bottom', 'time', 's')
+        self.curve = self.graphView.plot(self.x, self.y, pen=(255, 0, 0))
 
-        # curve = graphView.plot()  # create an empty "plot" (a curve to plot)
-        # windowWidth = 500  # width of the window displaying the curve
-        # Xm = linspace(0, 0, windowWidth)  # create array that will contain the relevant time series
-        # ptr = -windowWidth
+    def update_plot(self):
+        dt = 4e-3
+        # self.data_buffer.append(np.random.random_integers(50, 150))
+        # self.y[:] = self.data_buffer
+        self.y[:] = np.random.random_integers(50, 150)
+        self.x += dt
+        self.curve.setData(self.x, self.y)
 
-        # curve2 = graphView.plot()
-        # windowWidth2 = 500  # width of the window displaying the curve
-        # Xm2 = linspace(0, 0, windowWidth2)  # create array that will contain the relevant time series
-        # ptr2 = -windowWidth
-
-        self.datax = []
     def GrapgUpdateFunc(self):
 
-        # print(self.xs, self.ys)
-        # x = np.random.normal(size=1000)
-        # y = np.arange(1000)
-        # self.graphObject
-        # global curve, ptr, Xm
-        # Xm[:-1] = Xm[1:]  # shift data in the temporal mean 1 sample left
-        # value = self.readData  # read line (single value) from the serial port
-        # Xm[-1] = float(value)  # vector containing the instantaneous values
-        # ptr += 1  # update x position for displaying the curve
-        # curve.setData(Xm)  # set the curve with this data
-        # curve.setPos(ptr, 0)  # set x position in the graph to 0
-        # QtGui.QApplication.processEvents()
+        dtdata = 0
+        ## read serial data
+        if self.ser.in_waiting > 0:
+            try:
+                data = self.ser.read_until(b"\r\n")
+                data = data.decode("utf-8", errors='replace')
+            except Exception as e:
+                print(e)
+                data = ""
 
-        dat = self.readSerial()
-        print(dat)
-        if type(dat) == int:
-            if len(self.datax) >= 90:
-                self.datax = []
+            ## flow parser
+            if data.startswith(">f="):
+                dataList = data.split("\t")
+                # print(dataList)
+
+            ## various parser
+            elif data.startswith(">q="):
+                Qdata = data.replace(">q=", "")
+                print("q value is ", Qdata)
+
+            elif data.startswith(">dt="):
+                dtdata = data.replace(">dt=", "")
+                # print("dt_data value is ", dtdata)
+
+            elif data.startswith(">dtReal="):
+                dtRealdata = data.replace(">dtReal=", "")
+                # print("dtReal value is ", dtRealdata)
+
+            elif data.startswith(">chq="):
+                avlChnls = data.replace(">chq=", "")
+                # print("available channels are ", avlChnls)
+
+            elif data.startswith(">v="):
+                dataList = data.split("\t")[1:]
+                # print(dataList)
+                lo = _map(float(dataList[0]), 0, 1023, 0, 5)
+
+                # if len(self.x) >= 800:
+                #     self.x = [0]
+                #     self.y = [0]
+                # else:
+                #     self.y.append(lo)
+                #     self.x.append(self.x[-1] + dtdata)
+
+            elif data.startswith(">tTotalReal"):
+                tTotalRealData = data.replace(">tTotalReal", "")
+                # print("tTotalReal value is ", tTotalRealData)
+
             else:
-                self.datax.append(dat)
-            # print(self.datax)
-            self.datos2 = self.graphView.plot(pen="y")
-            self.datos2.setData(self.datax)
-            # self.graphView.setLimits(xMax=100, xMin=0)
+                print(data)
+
         else:
-            pass
+            return
+
+        # update graph
 
 
-
-        # print("update graph")
+        self.curve.setData(self.x, self.y)
 
     # *****************CALL BACK FUNCTIONS*******************#
-    ######## Button Command CallBack Methods
+    ####### Button Command CallBack Methods
+
     def powerButtonFunc(self):
 
         global _COMPORTs
@@ -161,6 +191,7 @@ class Application(QMainWindow):
             self.MainUi.SamplingControlOnceButton.setChecked(False)
             self.MainUi.SamplingControlFlowButton.setChecked(False)
             self.MainUi.SamplingControlVariousButton.setChecked(True)  # Set Various To default
+            QTimer.singleShot(3000, lambda: self.SamplingControlVariousButtonCMD()) # and call the various function
 
             # Start Update Timer AND DISABLE REFRESH BUTTON
 
@@ -170,8 +201,10 @@ class Application(QMainWindow):
             self.ser.baudrate = self.Baudrate
             self.ser.port = self.Port
             self.ser.open()
-            self.timer.start(4e-3)
+            self.timer.start()
             print(self.ser)
+
+            # Send to the arduino the default settings
 
         
             # self.timerGraph = QtCore.QTimer()
@@ -381,6 +414,7 @@ class Application(QMainWindow):
         elif (Rawval >= 1e6):
             self.MainUi.SampConrolDTLabel.setText("{:.2f} S/Div".format(val))
 
+
         #### Change 'Sampling Control Value' text
         val = self.SampilngValue
         Rawval = self.SampilngValue / 1e-6
@@ -411,6 +445,8 @@ class Application(QMainWindow):
             self.MainUi.SamplingControlsFrame.setTitle("Sampling Contorls ({:.1f} mS)".format(_Rawval))
         elif (Rawval >= 1e6):
             self.MainUi.SamplingControlsFrame.setTitle("Sampling Contorls ({:.1f} S)".format(val))
+
+
 
     ####### ComboBox CallbBacks
     def ConfSerComPortComboCMD(self):
@@ -621,7 +657,7 @@ class Application(QMainWindow):
             # self.GrapgUpdateFunc()
 
             if data.startswith(">f=0"):
-                "['>f=0', '4e-3', '87', '82', '79', '83\r\n']"
+                # "['>f=0', '4e-3', '87', '82', '79', '83\r\n']"
             
                 self.ch1Data = int(data.split("\t")[2])
             else:
