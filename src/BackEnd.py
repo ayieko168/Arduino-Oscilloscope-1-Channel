@@ -9,6 +9,7 @@ except:
 import numpy as np
 from math import sin, cos
 import serial
+import pyqtgraph as pg
 
 try:
     import src.serialPorts as serialPorts
@@ -77,14 +78,24 @@ class Application(QMainWindow):
         self.Baudrate = 115200
         self.readData = ""
         self.ch1Data = 0
-        #### Defaults
-        self.Set_SigGenFreqSliderValue(50)
-        self.MainUi.SigGenDutyslider.setValue(25)
-        self.Set_SampConrolDTScaleValue(1e-3)
-        self.MainUi.SampControlQScale.setValue(100)
+        #### Oscilloscope Variables
+        self.sigFreq = 50 # Hz
+        self.sigTimeDiv = 1.0 / self.sigFreq  # Seconds
+        self.sigDuty = 25  # Percentage Time PWM On 
+        self.sampTimeDiv = 1e-3 # Seconds Per Division # dt
+        self.sampQ = 100 
+        self.sampDtTotal = self.sampQ * self.sampTimeDiv
+        self.chanVolDiv = 1 #Volt per Division
+        self.chanTimeDiv = self.sampTimeDiv * 10.0
+
+        #### Set Defaults
+        self.Set_SigGenFreqSliderValue(self.sigFreq)
+        self.MainUi.SigGenDutyslider.setValue(self.sigDuty)
+        self.Set_SampConrolDTScaleValue(self.sampTimeDiv)
+        self.MainUi.SampControlQScale.setValue(self.sampQ)
         self.MainUi.ConfSerBaoudRateCombo.addItems(_BAUDRATES)
-        self.MainUi.ConfSerComPortCombo.addItems([""] + _COMPORTs)
         self.MainUi.ConfSerBaoudRateCombo.setCurrentIndex(8)
+        self.MainUi.ConfSerComPortCombo.addItems([""] + _COMPORTs)
         ############ Serial Setup ########################
         self.ser = serial.Serial(timeout=1)  #initiate a serial but not connect yet
         #### Update Timer Setting Up and Start Graphing
@@ -96,26 +107,20 @@ class Application(QMainWindow):
         self.graphView.setBackground("k")
         # self.graphView.setMouseEnabled(False, False)
 
-        self.x = [x for x in range(1, 100)]
-        self.y = [sin(x)*6 for x in range(1, 100)]
+        self.y = np.zeros(self.sampQ)
+        self.x = np.arange(0.0, len(self.y))
 
         # PyQtGraph settings
         self.graphView.showGrid(x=True, y=True)
-        self.graphView.setLabel('left', 'amplitude', 'uV')
-        self.graphView.setLabel('bottom', 'time', 's')
-        self.curve = self.graphView.plot(self.x, self.y, pen=(255, 0, 0))
+        self.graphView.setLabel('left', 'amplitude', 'V')
+        self.graphView.setLabel('bottom', 'time', 's')        
+        self.curve = self.graphView.plot(self.x, self.y, pen=(255, 0, 0), symbol="o", symbolSize=2)
 
-    def update_plot(self):
-        dt = 4e-3
-        # self.data_buffer.append(np.random.random_integers(50, 150))
-        # self.y[:] = self.data_buffer
-        self.y[:] = np.random.random_integers(50, 150)
-        self.x += dt
-        self.curve.setData(self.x, self.y)
+        self.lastTime = time.time()
+        self.fps = None
 
     def GrapgUpdateFunc(self):
-
-        dtdata = 0
+        
         ## read serial data
         if self.ser.in_waiting > 0:
             try:
@@ -124,23 +129,37 @@ class Application(QMainWindow):
             except Exception as e:
                 print(e)
                 data = ""
+                return
 
             ## flow parser
             if data.startswith(">f="):
                 dataList = data.split("\t")
-                # print(dataList)
+                # print(dataList)  ##==> ['>f=0', '4e-3', '1020', '689', '472', '324\r\n']
+                try:
+                    int(dataList[2])
+                    float(dataList[1])
 
+                    foo = _map(float(dataList[2].strip()), 0, 1023, 0, 5)
+                    self.sampDtTotal = float(dataList[1].strip())
+                
+                    self.y = np.append(self.y[1:], foo)
+                    self.x = np.append(self.x[1:], self.x[-1] + float(dataList[1]))
+
+                except:
+                    pass 
+                
             ## various parser
             elif data.startswith(">q="):
                 Qdata = data.replace(">q=", "")
-                print("q value is ", Qdata)
-
-            elif data.startswith(">dt="):
-                dtdata = data.replace(">dt=", "")
-                # print("dt_data value is ", dtdata)
+                self.sampQ = int(Qdata.strip())
+                # print("q value is ", Qdata)
 
             elif data.startswith(">dtReal="):
                 dtRealdata = data.replace(">dtReal=", "")
+                try:
+                    self.sampTimeDiv = float(dtRealdata.strip())
+                except ValueError:
+                    return
                 # print("dtReal value is ", dtRealdata)
 
             elif data.startswith(">chq="):
@@ -149,30 +168,52 @@ class Application(QMainWindow):
 
             elif data.startswith(">v="):
                 dataList = data.split("\t")[1:]
-                # print(dataList)
+                try:
+                    int(dataList[0]) 
+                except:
+                    return 
                 lo = _map(float(dataList[0]), 0, 1023, 0, 5)
-
-                # if len(self.x) >= 800:
-                #     self.x = [0]
-                #     self.y = [0]
-                # else:
-                #     self.y.append(lo)
-                #     self.x.append(self.x[-1] + dtdata)
+                self.y = np.append(self.y[1:], lo) 
+                self.x = np.append(self.x[1:], self.x[-1] + self.sampTimeDiv)
+                # self.y = np.append(self.y, lo) 
+                # self.x = np.append(self.x, self.x[-1] + self.sampTimeDiv)
 
             elif data.startswith(">tTotalReal"):
                 tTotalRealData = data.replace(">tTotalReal", "")
+                try:
+                    self.sampDtTotal = float(tTotalRealData.strip())
+                except ValueError:
+                    pass
                 # print("tTotalReal value is ", tTotalRealData)
-
+                
             else:
-                print(data)
+                self.y = np.append(self.y[1:], 0) 
+                self.x = np.append(self.x[1:], self.x[-1] + self.sampTimeDiv)
+                # self.y = np.append(self.y, 0)
+                # self.x = np.append(self.x, self.x[-1] + self.sampTimeDiv)
+
+                self.curve.setData(self.x, self.y)
 
         else:
-            return
+            pass
+            
 
         # update graph
-
-
+        now = time.time()
+        dtt = now - self.lastTime
+        self.lastTime = now
+        
+        if dtt != 0.0:
+            if self.fps is None:
+                self.fps = 1.0/dtt
+            else:
+                s = np.clip(dtt*3., 0, 1)
+                self.fps = self.fps * (1-s) + (1.0/dtt) * s
+        
+        # self.graphView.setXRange(0.0, self.sampDtTotal, padding=0.5)
+        self.graphView.setTitle('%0.2f fps' % self.fps)
         self.curve.setData(self.x, self.y)
+        
 
     # *****************CALL BACK FUNCTIONS*******************#
     ####### Button Command CallBack Methods
@@ -201,7 +242,7 @@ class Application(QMainWindow):
             self.ser.baudrate = self.Baudrate
             self.ser.port = self.Port
             self.ser.open()
-            self.timer.start()
+            self.timer.start(0)
             print(self.ser)
 
             # Send to the arduino the default settings
