@@ -4,7 +4,8 @@
  This software is an attempt at creating an arduino-based / software-based oscilloscope for those who can't afford 
  this essential electronics hobbyist instrument.
  
- This project was inspired by 
+ This project was inspired by [Rogerio Bego's](https://github.com/rogeriobego/) Instructable project titled [Oscilloscope Arduino-Processing](https://www.instructables.com/id/Oscilloscope-Arduino-Processing/) where he made a very nice and functional 
+ arduino-based oscilloscope using processing to create the GUI. [Here](https://github.com/rogeriobego/oscilloscope-arduino-processing) is his github project page.
  
  NOTE: This project is not yet functional as an oscilloscope but can plot data from the arduino
  
