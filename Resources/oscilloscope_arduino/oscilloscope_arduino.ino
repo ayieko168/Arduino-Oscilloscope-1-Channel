@@ -1,3 +1,8 @@
+/*
+ * This code contains the original functionality of the 4-channel oscilloscope.
+ It does not insclude the mutiplexed capasitor and resistor measurement function.
+ */
+
 
 #define version_ "v1.5"
 
@@ -51,10 +56,11 @@ boolean channels_state[] = {true,true,true,true}; // A list containing the chann
 unsigned int dt = 4; // 100us to 1000us(1ms) to 3000ms(3s) - Controlls time between each sample - Samlpling Period
 char unit_ = 'm'; // unit : m = millisecond, u = microsecond
 
-// note: for reading the 3 channels the minimum time is approximately 380us
-// note: for reading the 4 channels the minimum time is approximately 500us
-//   Therefore:   1 channel should give 120us
-
+/* 
+ *note: for reading the 3 channels the minimum time is approximately 380us
+ *note: for reading the 4 channels the minimum time is approximately 500us
+ *Therefore:   1 channel should give 120us
+*/
 
 // Sampling Configurations
 boolean various = false; // v = several
@@ -71,17 +77,12 @@ boolean read_RC = false; // Boolean for weather to read the resistor/capacitor v
 #define pinB 8 // pin B 9 multiplex
 byte entrada = 0;
 int vi, vf, v;
-//float rx=0, cx=0;
-//float r[]={0.0,200.0,20000.0,1000000.0};
-//float re[]={0.0,145.2,20692.9,1017847.5};
-//float vcc[]={0,871.5,1026.3,1027.1};
 unsigned long dtRC=0;
 char unidadeRC=' ';
 boolean debug=true;
 //-------------------------------------------------------------------
 
 void setup() {
-
 
  //---------- Configure the ADC preescaler -------------------
  ADCSRA &= ~PS_128; // Clears arduino library configuration
