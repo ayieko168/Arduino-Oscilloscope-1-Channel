@@ -430,7 +430,7 @@ void printConfig(){
    Serial.print(">? T=(q*dt)= "); Serial.print(t); Serial.print(unit_); Serial.println("s ");
    Serial.print(">? Channels: "); 
    for (int k=0; k<4; k++){
-      Serial.print("Channel-"); Serial.print(k); Serial.print(" is "); 
+      Serial.print("Channel-"); Serial.print(k+1); Serial.print(" is "); 
       if (channels_state[k]) {
         Serial.print("ON, ");     
       } else {
