@@ -109,7 +109,7 @@ void setup() {
   Serial.println();
 
   
-  Serial.println("Initial boot of the board.");
+//  Serial.println("Initial /boot of the board.");
   Serial.print("Version Number="); Serial.println(version_);
   //printHelp();
   //printConfig();  
@@ -326,42 +326,41 @@ void readSerial(){
               case 'm': // if parsed unit is in milli(m), then convert to micro(u)
                 pwmP=long(parsed_float * 1000.0);
                 break;
-              case ' ': // está em segundo ( ) então converter para micro (u)
+              case ' ': // if the parsed unit is in second(), then convert to micro(u)
                 pwmP=long(parsed_float*1000000.0);
                 break;
-               default: // se veio caracter desconhecido faço o pwmP=1s
-                pwmP=1000000l; // coloquei L no final do 100000 para dizer que é long
-//                Serial.print("=> erro unidade pwmP, usando padrao(us)="); Serial.println(1000000);
+               default: // if an unknown character is parsed, set pwmP = 1second
+                pwmP=1000000l; // I put L at the end of 100000 to say it’s long
                 break;
             }
             Timer1.setPeriod(pwmP);
-            Timer1.setPwmDuty(9,map(pwmPon,0,100,0,1023)); 
-//            Serial.print("=> setPeriod="); Serial.println(pwmP);
+            Timer1.setPwmDuty(9, map(pwmPon, 0, 100, 0, 1023)); 
           }
           break;
-         case 'o': // Sinal: alterar tempo em ON ex: o25% o50%
-          parsed_integer=int(Serial.parseFloat());
-          first_read_char=Serial.read(); // só ler a % e desprezar (faz o parseInt ficar mais rapido
-          if (parsed_integer>=0 && parsed_integer<=100){
-            pwmPon=parsed_integer;
-            Timer1.setPwmDuty(9,map(pwmPon,0,100,0,1023)); 
-//            Serial.print("=> pwm on="); Serial.print(k); Serial.println("%");          
+       case 'o': // Signal Generator: change the PWM signal's time on ON - Syntax: o(time<100)% - Example: o25% o50%
+          parsed_integer = int(Serial.parseFloat());
+          first_read_char = Serial.read(); // just read the % and pass it to make the parseInt faster
+          
+          if (parsed_integer >= 0 && parsed_integer <= 100){
+            pwmPon = parsed_integer;
+            Timer1.setPwmDuty(9, map(pwmPon, 0, 100, 0, 1023)); 
           }
           break;
-         default:
-           Serial.print("erro c="); Serial.println(first_read_char, HEX);
+       
+       default:
+           Serial.print("erro c= "); Serial.println(first_read_char, HEX);
     }
   }
 }
 
 void calcBuffer(){
-  //Serial.println("entrou calcBuffer");
-  channels_on=0;
-  // conta a quantidade de canais ativos
-  for (int k=0;k<4;k++){
+  // Reset the channels on variable and Recount the number of active channels.
+  channels_on = 0;
+  for (int k=0; k<4; k++){
     if (channels_state[k]) {channels_on+=1;}
   }
-  // calc size of each channel
+  
+  // Calculate the size of each channel
   switch (channels_on){
     case 0:
       qmax=0;
@@ -379,31 +378,19 @@ void calcBuffer(){
       qmax=100;
       break;
   }
-  /*
-  if (channels_on<=0) {
-    qmax=0;
-  } else {
-    qmax=408/channels_on; // channels_on-qmax; 4-102; 3-136; 2-204; 1-408
+
+  if (q > qmax) {
+    q = qmax;
   }
-*/
-  if (q>qmax) {
-    q=qmax;
-  }
-  //Serial.print("q=408/channels_on=");Serial.print("408/");Serial.print(channels_on);Serial.print("=");Serial.println(q);
-  // qtdCanais-qmax (channels_on-qmax) (4-100) (3-130) (2-200) (1-400)
+  
+  // Recalculate the initial position of the active channel's data in the data buffer
   int chInit=0;
   for (int k=0; k<4; k++){
     if (channels_state[k]) {
-      chs_init_pos_list[k]=chInit;
+      chs_init_pos_list[k] = chInit;
       chInit+=qmax;
     }
   }
-  
- // Serial.print("channels_on="); Serial.print(channels_on); Serial.print(" q="); Serial.print(q); Serial.print(" qmax="); Serial.println(qmax);
-//  for (int k=0; k<4; k++){
- //    Serial.print("k=");Serial.print(k); Serial.print(" chs_init_pos_list[k]="); Serial.println(chs_init_pos_list[k]);
- // }
-  
 }
 
 void printHelp(){
@@ -436,23 +423,23 @@ void printHelp(){
 }
 
 void printConfig(){
-   Serial.println("------ configuracoes -------");
+   Serial.println(">>>Configurations...");
    Serial.print(">? q="); Serial.println(q);
    Serial.print(">? qmax="); Serial.println(qmax);
    Serial.print(">? dt="); Serial.print(dt); Serial.print(unit_); Serial.println("s");
-   float t=(float)q * (float)dt;
-   Serial.print(" -> T=(q*dt)= "); Serial.print(t); Serial.print(unit_); Serial.println("s ");
-   Serial.print(">? Canais: "); 
+   float t = (float)q * (float)dt;
+   Serial.print(">? T=(q*dt)= "); Serial.print(t); Serial.print(unit_); Serial.println("s ");
+   Serial.print(">? Channels: "); 
    for (int k=0; k<4; k++){
-      Serial.print("  channels_state"); Serial.print(k); Serial.print("="); 
+      Serial.print("Channel-"); Serial.print(k); Serial.print(" is "); 
       if (channels_state[k]) {
-        Serial.print("o");     
+        Serial.print("ON, ");     
       } else {
-        Serial.print("x");
+        Serial.print("OFF, ");
       }
    }
    Serial.println();
-   Serial.print(">? triggered_channel="); Serial.println(triggered_channel);
+   Serial.print(">? Triggered Channel="); Serial.println(triggered_channel);
    Serial.print(">? once="); Serial.println(once);
    Serial.print(">? various="); Serial.println(various);
    Serial.print(">? flow="); Serial.println(flow);
@@ -465,16 +452,19 @@ void printConfig(){
 unsigned long microsOuMillis(){
    if (unit_=='u'){
       return micros();
-   } else {
+   } 
+   else {
       return millis();
    }
 }
 
-//-- procurar tensão maior que zero no triggered_channel ----
-//-- se UMA=true então fica aguardando indefinitivamente
-//-- se UMA=false então fica aguardando até o tempo tFIM (q*dt)
-boolean trigger(){ // a variavel triggered_channel indica qual canal fará o trigger: 0,1,2 ou 3
-  unsigned long tFim; // contador do tempo Final
+
+boolean trigger(){
+  //-- look for voltage greater than zero in triggered_channel ----
+  //-- if once = true then it waits indefinitely
+  //-- if once = false then wait until time tFim (q * dt)
+  //-- the triggered_channel variable indicates which channel will trigger: 0, 1, 2 or 3
+  unsigned long tFim; // Final time counter
   int v1=0,v2=0; 
   //int c1=0, c2=0;
   boolean achou=false;
