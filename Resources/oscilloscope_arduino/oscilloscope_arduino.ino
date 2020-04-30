@@ -160,25 +160,30 @@ void readSerial(){
   int parsed_integer;
   float parsed_float;
   char first_read_char, second_read_char;
+  
   if (Serial.available() > 0){
     first_read_char = Serial.read();
+    
     switch (first_read_char){
-       case 'h': // enviar help pela serial
+       case 'h': // send help via serial
           printHelp();
           break;
-       case 'd': //alterar o valor de dt (us/ms)
-          parsed_integer=Serial.parseInt(); // como e inteiro então vai de 0 a 32767 (parseint limita 16bits)
-          if (parsed_integer>=1 && parsed_integer<=30000) {//28/08/15 deve ser dtmin=400us(3canais) dtmax=30000 
-             dt=parsed_integer;
+       
+       case 'd': // change the value of dt(Sampling Period) - (us/ms) - 
+          parsed_integer=Serial.parseInt(); // accepts an integer then goes from 0 to 32767 (parseint limits 16bits)
+          if (parsed_integer >= 1 && parsed_integer <= 30000) {// 08/08/15 must be dtmin = 400us (3channels) dtmax = 30000
+             dt = parsed_integer;
           } 
+          
           first_read_char=Serial.read();
           if (first_read_char=='u' || first_read_char=='m'){
             unit_=first_read_char;
-          } else { // sem unidade é segundo, então converter para mili (x1000)m
+          } 
+          else { // sem unidade é segundo, então converter para mili (x1000)m
             unit_='m';
             dt*=1000;
           }
-//          Serial.print("=> dt="); Serial.print(dt); Serial.print(unidade); Serial.println("s");
+
           break; 
        case 'q': // alterar valor do q.(ponto no final) (quantidade de leituras)
           parsed_integer=Serial.parseInt(); // inteiro de 0 a 32767
