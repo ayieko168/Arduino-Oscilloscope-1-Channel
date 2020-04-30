@@ -117,7 +117,6 @@ void setup() {
   // Set the resistor and capacitor read pins
   pinMode(pinA, OUTPUT);
   pinMode(pinB, OUTPUT);
-  RC_selector(0);
 }
 
 void callback(){
@@ -149,7 +148,7 @@ void loop() {
    
    if (read_RC){
      if (millis()>=dtRC){
-       lerResistorCapacitor();
+       readResistorCapasitor();
        dtRC=millis()+3000;
      }
    }
@@ -498,45 +497,40 @@ void sendVariousSamples(){
   if (triggered_channel >= '0' && triggered_channel <= '3'){
     Serial.print("trigger="); Serial.println(trigger());
    }
-  tTotalReal=microsOrMillis();
+  tTotalReal = microsOrMillis();
 
   for (int k=0; k<q; k++){
-    final_counter_time=microsOrMillis()+dt; 
-/*
-    if (channels_state[0]) {v0[k]=analogRead(A0);}
-    if (channels_state[1]) {v1[k]=analogRead(A1);}
-    if (channels_state[2]) {v2[k]=analogRead(A2);}
-    if (channels_state[3]) {v3[k]=analogRead(A3);}
-*/
+    final_counter_time = microsOrMillis()+dt; 
 
+    // if a channel is activated, at its initial buffer position, append q reading to the buffer
     if (channels_state[0]) {values_buffer[chs_init_pos_list[0]+k] = analogRead(A0);}
     if (channels_state[1]) {values_buffer[chs_init_pos_list[1]+k] = analogRead(A1);}
     if (channels_state[2]) {values_buffer[chs_init_pos_list[2]+k] = analogRead(A2);}
     if (channels_state[3]) {values_buffer[chs_init_pos_list[3]+k] = analogRead(A3);}
-    while (microsOrMillis()<final_counter_time){}
+    while (microsOrMillis() < final_counter_time){}
   }
 
+  tTotalReal = microsOrMillis() - tTotalReal; // total time to read all samples
+  dtReal = tTotalReal / q; // calculate the average time of each reading
   
-  tTotalReal=microsOrMillis()-tTotalReal; // total de tempo para ler todas as amostras
-  dtReal=tTotalReal/q; // calcular o tempo médio de cada leitura
   Serial.println();
   Serial.print(">q="); Serial.println(q);
   Serial.print(">dt="); Serial.print(dt); Serial.print(unit_); Serial.println("s");
   Serial.print(">dtReal="); Serial.print(dtReal); //  Serial.print(unit_); Serial.println("s");
-    if (unit_=='m'){
-      Serial.println("e-3");
-    }else if (unit_=='u'){
-      Serial.println("e-6");
-    }
+  if (unit_=='m'){
+    Serial.println("e-3");
+  }else if (unit_=='u'){
+    Serial.println("e-6");
+  }
     
-  // enviar quais canais serao enviados. ex: >ch=1<\t>3<\t>
+  //Send which channels will be sent. Example:> channels_on = 1 3 - TAb delemeted
   Serial.print(">channels_on="); Serial.print(channels_on); Serial.print("\t");
   for (int k=0; k<4; k++){
     if (channels_state[k]){Serial.print(k); Serial.print("\t");}    
   }
   Serial.println("");
   
-  //enviar os valores dos canais
+  //Send the channel values from the buffer - Tab delemeted
   for (int k=0; k<q; k++){
     Serial.print(">v="); Serial.print(k); Serial.print("\t");
     if (channels_state[0]) {Serial.print(values_buffer[chs_init_pos_list[0]+k]); Serial.print("\t");}
@@ -544,60 +538,36 @@ void sendVariousSamples(){
     if (channels_state[2]) {Serial.print(values_buffer[chs_init_pos_list[2]+k]); Serial.print("\t");}
     if (channels_state[3]) {Serial.print(values_buffer[chs_init_pos_list[3]+k]); Serial.print("\t");}
     Serial.println("");
-
-  /* 
-    if (channels_state[0]) {Serial.print(chs_init_pos_list[0]+k); Serial.print("\t");}
-    if (channels_state[1]) {Serial.print(chs_init_pos_list[1]+k); Serial.print("\t");}
-    if (channels_state[2]) {Serial.print(chs_init_pos_list[2]+k); Serial.print("\t");}
-    if (channels_state[3]) {Serial.print(chs_init_pos_list[3]+k); Serial.print("\t");}
-    Serial.println("");
-  */
   }
- /* -- eliminado em 07/May/2017 - criei buffer dinamico  values_buffer[408] --   
-  for (int k=0; k<q; k++){
-    Serial.print(">v=");
-    Serial.print(k); Serial.print("\t");
-    Serial.print(v0[k]); Serial.print("\t");
-    Serial.print(v1[k]); Serial.print("\t");
-    Serial.print(v2[k]); Serial.print("\t");
-    Serial.println(v3[k]);
-  } 
-  */ 
-  Serial.print(">tTotalReal="); Serial.print(tTotalReal); //Serial.print(unit_); Serial.println("s");
-    if (unit_=='m'){
-      Serial.println("e-3");
-    }else if (unit_=='u'){
-      Serial.println("e-6");
-    }
+ 
+  Serial.print(">tTotalReal="); Serial.print(tTotalReal);
+  if (unit_=='m'){Serial.println("e-3");} else if (unit_=='u'){Serial.println("e-6");}
 }
 
 void sendFlowSamples(){
-  int v0, v1, v2, v3; // guarda os valores das leituras
-  //byte v0, v1, v2, v3; // guarda os valores das leituras
-  boolean leu=false;
-    if (microsOrMillis()>=final_counter_time){
-      dtReal=microsOrMillis()-tIni;
-      tIni=microsOrMillis(); final_counter_time=tIni+dt;
-      if (channels_state[0]) {v0=analogRead(A0);}
-      if (channels_state[1]) {v1=analogRead(A1);}
-      if (channels_state[2]) {v2=analogRead(A2);}
-      if (channels_state[3]) {v3=analogRead(A3);}
-      //if (channels_state[0]) {v0=analogRead(A0)/4;}
-      //if (channels_state[1]) {v1=analogRead(A1)/4;}
-      //if (channels_state[2]) {v2=analogRead(A2)/4;}
-      //if (channels_state[3]) {v3=analogRead(A3)/4;}
-      leu=true;
-    }
-  if (leu){
+  int v0, v1, v2, v3; // Variables that stores readings values
+//  byte v0, v1, v2, v3; // Variables that stores readings values, uses less flash storage
+  boolean done_reading = false;
+  
+  if (microsOrMillis() >= final_counter_time){
+    dtReal=microsOrMillis() - tIni;
+    tIni=microsOrMillis();
+    final_counter_time = tIni + dt;
+    
+    if (channels_state[0]) {v0=analogRead(A0);}
+    if (channels_state[1]) {v1=analogRead(A1);}
+    if (channels_state[2]) {v2=analogRead(A2);}
+    if (channels_state[3]) {v3=analogRead(A3);}
+    done_reading=true;
+  }
+  
+  if (done_reading){
     Serial.print(">f=");
     Serial.print("0"); Serial.print("\t");
     Serial.print(dtReal); 
-      if (unit_=='m'){
-        Serial.print("e-3");
-      }else if (unit_=='u'){
-        Serial.print("e-6");
-      }
-      Serial.print("\t");
+    if (unit_=='m'){Serial.print("e-3");}else if (unit_=='u'){Serial.print("e-6");}
+    Serial.print("\t");
+    // If the channel is activated, print the read value to serial. - Tab delemeted
     if (channels_state[0]) {Serial.print(v0);} else {Serial.print("0");} Serial.print("\t");
     if (channels_state[1]) {Serial.print(v1);} else {Serial.print("0");} Serial.print("\t");
     if (channels_state[2]) {Serial.print(v2);} else {Serial.print("0");} Serial.print("\t");
@@ -605,115 +575,8 @@ void sendFlowSamples(){
   }
 }
 
-//=========== Rotinas para leitura de Resistor e Capacitor ===========
+//=========== Routines for Reading Resistor and Capacitor ===========
 
-void lerResistorCapacitor(){
-  descarregar();
-  lerEntrada(1);
-  if (vf-vi>=100) {// e' capacitor
-    calcCapacitor();
-  } else {
-    if (v<900) { // calcular valor do resistor
-      calcRx();
-    } else { // subir selecionar 2
-      // descarregar se for capacitor
-      descarregar();
-      lerEntrada(2);
-      if (vf-vi>=100) { // capacitor - escala 2
-        calcCapacitor();
-      } else { // resistor
-        if (v<900){ // calcular valor do resistor
-          calcRx();
-        } else { // subir selecionar 3 (nao consegue detectar capacitor corretamente)
-          lerEntrada(3);
-          if (v<900){
-            calcRx();
-          } else {
-            Serial.println(">rc=3\tColoque RC");
-          }
-        }
-      }
-    }
+void readResistorCapasitor(){
+  byte val;
   }
-}
-
-void calcCapacitor(){
-  float re[]={0.0,145.2,20692.9,1017847.5};
-  float cx=0;
-  descarregar();
-  RC_selector(1);
-  dtRC=millis(); 
-  while (analogRead(pinV)<647){} // 647 = 63.2% Vcc => (nessa voltagem  t=rc)
-  dtRC=millis()-dtRC; 
-  if (dtRC>=100) { // dentro da faixa Cx>1mF
-    cx=(float)dtRC/re[entrada];
-    unidadeRC='m';  //resultado em mF
-  } else { // fora da faixa, subir para escala 2
-    descarregar();
-    RC_selector(2);
-    dtRC=millis();
-    while (analogRead(pinV)<647){}
-    dtRC=millis()-dtRC;
-    if (dtRC>=10) { // dentro da faixa 
-      cx=(float)dtRC*1000.0/re[entrada];
-      unidadeRC='u'; // resultado em uF
-    } else { // fora da faixa, então subir escala
-      descarregar();
-      RC_selector(3);
-      dtRC=millis();
-      while (analogRead(pinV)<647){}
-      dtRC=millis()-dtRC;
-      cx=(float)dtRC*1000000.0/re[entrada]; 
-      unidadeRC='n'; // resultado em nF
-    }
-  }
-  Serial.print(">c="); Serial.print(entrada); Serial.print("\t"); Serial.print(cx); Serial.print(" "); Serial.print(unidadeRC); Serial.println("F");
-}
-
-void lerEntrada(byte e){
-  RC_selector(e);
-  dtRC=micros();
-  vi=analogRead(pinV);
-  v=0;
-  for (int k=0; k<10; k++){
-     v+=analogRead(pinV);
-  }
-  v/=10;
-  vf=analogRead(pinV);
-  dtRC=micros()-dtRC;
-}
-
-void descarregar(){
-  RC_selector(0);
-  while (analogRead(pinV)>0){}
-}
-
-void calcRx(){
-  float re[]={0.0,145.2,20692.9,1017847.5};
-  float vcc[]={0,871.5,1026.3,1027.1};
-  float rx=0;
-  rx=re[entrada]*(float)v/(vcc[entrada]-(float)v);
-  Serial.print(">r="); Serial.print(entrada); Serial.print("\t");
-  switch (entrada) {
-     case 1:
-      if (rx>=1000){
-        rx/=1000;
-        Serial.print(rx); Serial.println(" Kohm");
-      } else {
-        Serial.print(rx); Serial.println(" ohm");
-      }
-      break;
-     case 2:
-      Serial.print(rx/1000); Serial.println(" Kohm");
-      break;
-     case 3:
-      Serial.print(rx/1000000); Serial.println(" Mohm");
-      break; 
-  }
-}
-
-void RC_selector(byte e){
-  entrada=e;
-  digitalWrite(pinA,bitRead(entrada,0));
-  digitalWrite(pinB,bitRead(entrada,1));
-}
