@@ -46,7 +46,7 @@ int q = 100; // The number of readings for each channel
 int qmax = 100; // The maximum quantity allowed for q ; channels_on-qmax; 4-100; 3-130; 2-200; 1-400
 
 
-int vtrigger = 0; // The trigger voltage
+int trigger_voltage = 0; // The trigger voltage
 boolean channels_state[] = {true,true,true,true}; // A list containing the channel states. (Modify to enable/disable channels) (True=enable, False=Disable)
 unsigned int dt = 4; // 100us to 1000us(1ms) to 3000ms(3s) - Controlls time between each sample - Samlpling Period
 char unit_ = 'm'; // unit : m = millisecond, u = microsecond
@@ -206,117 +206,125 @@ void readSerial(){
           if (first_read_char >= '0' && first_read_char <= '3'){
              if (second_read_char=='o'){
                 channels_state[first_read_char-'0'] = true;
-             }else if (second_read_char=='x'){
+             }
+             else if (second_read_char=='x'){
                 channels_state[first_read_char-'0'] = false;
              }
              // Recalculate the buffer size for each channel and update the initial index for each channel on the values buffer
              calcBuffer();
-             //Serial.println("saiu calcBuffer");
-/*            Serial.print("=> Canais: ");
-              for (k=0; k<3;k++){
-                Serial.print("channels_state"); Serial.print(k); Serial.print("="); Serial.print(channels_state[k]);
-              }
-              Serial.println();
-*/              
             }  
           break;
-       case 't': // trigger: t(canal)
-                 // trigger:  t0, t1, t2, t3
-                 //           tx   desligado
-                 //           tv512.  valor da tensão 0-1024 (5v)
+       
+       case 't': // Set the triggered channel or the trigger volteage(value 0-1024 (5v)) - Syntax: t(channel) or tv(voltage) or tx=trigger off - Examples: t0, t1, t2, t3, tv512
         delay(100);
         first_read_char=Serial.read();
-        if ((first_read_char>='0' && first_read_char<='3') || first_read_char=='x'){
-           triggered_channel=first_read_char;      
-        } else if (first_read_char=='v'){
+        
+        if ((first_read_char >= '0' && first_read_char <= '3') || first_read_char == 'x'){
+           triggered_channel = first_read_char;      
+        }
+        else if (first_read_char=='v'){
           parsed_integer=Serial.parseInt();
           first_read_char=Serial.read();
-          if (parsed_integer>=0 && parsed_integer<=1024) {
-            vtrigger=parsed_integer;
+          
+          if (parsed_integer >= 0 && parsed_integer <= 1024) {
+            trigger_voltage = parsed_integer;
           }
         }
-        
-//        Serial.print("=> triggered_channel="); Serial.println(triggered_channel);
-        break;
+          break;
+       
        case '?':
           printConfig(); 
           break;
-        case '1': // enviar Uma Amostra (q leituras)
+       
+       case '1': // Send A Sample (q readings)
           if (!once) once=true;
+          
           if (once){
              various=false;
              flow=false; 
           }
-//          Serial.print("=> once="); Serial.println(once);
+
           break;
-        case 'v': // o(on)/x(off) - enviar Varias Amostras (q leituras cada)
+       case 'v': // Send Multiple Samples (of q readings each) - Syntax: v(o|x)>o(on)/x(off)
            delay(100);
-           first_read_char=Serial.read();
-           if (first_read_char=='o') {
+           first_read_char = Serial.read();
+           
+           if (first_read_char == 'o') {
               various=true;
-           } else {
+           }
+           else {
               various=false;
            }
+          
           if (various){
              once=false;
              flow=false; 
           }
-//          Serial.print("=> various="); Serial.println(various);
+          
           break;
-        case 'f': // o(on)/x(off) - enviar Fluxo (ler e enviar - nao armazenar)
+       case 'f': // Send A flow of raw readings, do not store on buffer - Syntax: f(o|x)>o(on)/x(off)
            delay(100);
            first_read_char=Serial.read();
-           if (first_read_char=='o') {
-              flow=true;
-           } else {
-              flow=false;
+           
+           if (first_read_char == 'o') {
+              flow = true;
            }
-          if (flow){
+           else {
+              flow = false;
+           }
+           
+           if (flow){
              various=false;
              once=false; 
-             if (unit_=='u'){ // microsegundo
-               tIni=micros(); tFim=tIni+dt;
-             } else{ // milisegundo
-               tIni=millis(); tFim=tIni+dt;
+             
+             if (unit_=='u'){ // microsecond
+               tIni = micros(); 
+               tFim = tIni + dt;
+             }
+             else{ // millisecond
+               tIni = millis(); 
+               tFim = tIni + dt;
              }
           }
-//          Serial.print("=> flow="); Serial.println(flow);
+
           break;
-         case 'r': // (on/off) - enviar valor lido do Resistor em A5
-           delay(100);
-           first_read_char=Serial.read();
-           if (first_read_char=='o') {
+       
+       case 'r': // Send value read from Resistor in pin A5 - Syntax: r(o|x)>o(on)/x(off)
+           delay(100); 
+           first_read_char = Serial.read();
+           
+           if (first_read_char == 'o') {
               read_RC=true;
-           } else {
+           } 
+           else {
               read_RC=false;
            }
-//           Serial.print("=> read_RC="); Serial.println(read_RC);
            dtRC=0;
            break;
-         case 's': // Sinal: Ligar/desligar Gerador de Sinal
+       case 's': // Signal Generator: Turn Signal Generator on / off - Syntax: s(o|x)>o(on)/x(off)
           delay(100);
-          first_read_char=Serial.read();
+          first_read_char = Serial.read();
+          
           if (first_read_char=='o'){
-            Timer1.restart(); // zera o contador
-            Timer1.start(); //inicio
-//            Serial.println("Timer1 restart/start");
-          }else{
-            Timer1.stop();
-//            Serial.println("Timer1.stop()");
+            Timer1.restart(); // Reset the counter
+            Timer1.start(); // start
+          }
+          else{
+            Timer1.stop(); // Stop the counter
           }
           break;
-         case 'p': // Sinal: alterar Período ex: p100m p343u
-          parsed_float=Serial.parseFloat();
-          if (parsed_float>0){
-            first_read_char=Serial.read(); // ler unidade e converter para micro
-//            Serial.print(">>parsed_float="); Serial.print(parsed_float); Serial.print(" c="); Serial.println(c);
+       case 'p': // Signal Generator: Change the signal generator's period - Syntax: p(period_float)(unit)> - Example: p100m p343u
+          parsed_float = Serial.parseFloat();
+          
+          if (parsed_float > 0){
+            first_read_char = Serial.read();
+            
             switch (first_read_char){
-              case 'u': //já está em micro (u)
-                pwmP=long(parsed_float);
+              case 'u': // if paresd unit is already in micro(u)
+                pwmP = long(parsed_float);
                 break;
-              case 'm': // está em mili (m) então converter para micro (u)
-                pwmP=long(parsed_float*1000.0);
-//                Serial.print("parsed_float="); Serial.print(parsed_float); Serial.print("m"); Serial.print(" pwmP=parsed_float*1000="); Serial.println(pwmP);
+              case 'm': // if parsed unit is in milli(m), then convert to micro(u)
+                pwmP=long(parsed_float * 1000.0);
                 break;
               case ' ': // está em segundo ( ) então converter para micro (u)
                 pwmP=long(parsed_float*1000000.0);
@@ -471,24 +479,24 @@ boolean trigger(){ // a variavel triggered_channel indica qual canal fará o tri
   //int c1=0, c2=0;
   boolean achou=false;
     tFim=microsOuMillis()+q*dt;
-    // dispara na subida do valor vtrigger+10
-    //fica lendo a tensão enquanto for maior que vtrigger 
+    // dispara na subida do valor trigger_voltage+10
+    //fica lendo a tensão enquanto for maior que trigger_voltage 
     //   E tempo menor que tFim
     do{
       v1=analogRead(triggered_channel-'0');
       //c1++;
-    }while (v1>vtrigger && microsOuMillis()<tFim);
+    }while (v1>trigger_voltage && microsOuMillis()<tFim);
   //  while (v1=analogRead(triggered_channel-'0')>0 && microsOuMillis()<tFim){c1++;}
-    if (v1<=vtrigger){
+    if (v1<=trigger_voltage){
       tFim=microsOuMillis()+q*dt;
-      //fica lendo a tensão enquanto for menor ou igual a 10+vtrigger
+      //fica lendo a tensão enquanto for menor ou igual a 10+trigger_voltage
       // E tempo menor que tFim
       do{
         v2=analogRead(triggered_channel-'0');
         //c2++;
-      }while(v2<=10+vtrigger && microsOuMillis()<tFim);
+      }while(v2<=10+trigger_voltage && microsOuMillis()<tFim);
       //while (v2=analogRead(triggered_channel-'0')<=0 && microsOuMillis()<tFim){c2++;}
-      if (v2>10+vtrigger){ 
+      if (v2>10+trigger_voltage){ 
         achou=true;
       }
       //Serial.print("v1="); Serial.print(v1); Serial.print(" v2=");Serial.println(v2);
