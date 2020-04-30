@@ -86,13 +86,13 @@ void setup() {
  //---------- Configure the ADC preescaler -------------------
  ADCSRA &= ~PS_128; // Clears arduino library configuration
  
- // Possible prescaler values. Just uncomment the line with desired prescaler
+  // Possible prescaler values. Just uncomment the line with desired prescaler
   // PS_16, PS_32, PS_64 or PS_128
   //ADCSRA |= PS_128; // 64 prescaler
   //ADCSRA |= PS_64; // 64 prescaler
   //ADCSRA |= PS_32; // 32 prescaler
   ADCSRA |= PS_16; // 16 prescaler
-//----------------------------------------------------------
+  //----------------------------------------------------------
   
   //Set Timer1 pwm (pin9) and pin10 to monitor frequency
   pinMode(10, OUTPUT);
@@ -165,49 +165,51 @@ void readSerial(){
     first_read_char = Serial.read();
     
     switch (first_read_char){
-       case 'h': // send help via serial
+       case 'h': // Send help via serial
           printHelp();
           break;
        
-       case 'd': // change the value of dt(Sampling Period) - (us/ms) - 
-          parsed_integer=Serial.parseInt(); // accepts an integer then goes from 0 to 32767 (parseint limits 16bits)
-          if (parsed_integer >= 1 && parsed_integer <= 30000) {// 08/08/15 must be dtmin = 400us (3channels) dtmax = 30000
+       case 'd': // change the value of dt;(Sampling Period) - Syntax: d(integer)(unit) - Example: d652u, d859m, d565=d565s=d565S
+          parsed_integer=Serial.parseInt(); // Accepts an integer then goes from 0 to 32767 (parseint limits 16bits) and must be dtmin = 400us (3channels) dtmax = 30000
+          if (parsed_integer >= 1 && parsed_integer <= 30000) {
              dt = parsed_integer;
           } 
           
-          first_read_char=Serial.read();
+          first_read_char=Serial.read(); // Parse for the sent unit of measurement
           if (first_read_char=='u' || first_read_char=='m'){
-            unit_=first_read_char;
+            unit_ = first_read_char;
           } 
-          else { // sem unidade é segundo, então converter para mili (x1000)m
-            unit_='m';
+          else { // Without unit is second, then convert to milli (x1000) m
+            unit_ = 'm';
             dt*=1000;
           }
 
           break; 
-       case 'q': // alterar valor do q.(ponto no final) (quantidade de leituras)
-          parsed_integer=Serial.parseInt(); // inteiro de 0 a 32767
-          first_read_char=Serial.read(); // para ir mais rápido colocar um . no final ex: q150.
+       
+       case 'q': // change q value (number of readings on the buffer)
+          parsed_integer=Serial.parseInt(); // Integer from 0 to 32767
+          first_read_char=Serial.read(); // To parse faster put one. at the end eg: q150.
+          
           if (parsed_integer>=1 && parsed_integer<=qmax) {
              q=parsed_integer; 
           }
-          //calcBuffer(); //não precisa pois será usado o qmax
+          //calcBuffer(); // you don't need it because qmax will be used
           Serial.print("=> q="); Serial.println(q);
           break;
-       case 'c': //cnm : n=0-3, m=(o)ativa/(x)desativa canal n exemplo:  c0x,  c2o
+       
+       case 'c': // Disable or Enable a channel - Syntax: c(channel)(mode): channel = 0-3, mode = (o)enables & (x)disables channel n - Example: c0x, c2o
           delay(100);
           first_read_char=Serial.read();
           delay(100);
           second_read_char=Serial.read();
+          
           if (first_read_char >= '0' && first_read_char <= '3'){
              if (second_read_char=='o'){
-                channels_state[first_read_char-'0']=true;
+                channels_state[first_read_char-'0'] = true;
              }else if (second_read_char=='x'){
-                channels_state[first_read_char-'0']=false;
+                channels_state[first_read_char-'0'] = false;
              }
-             // recalcular o buffer para cada canal e colocar o indice
-             // inicial para cada canal
-             //Serial.println("entrar calcBuffer");
+             // Recalculate the buffer size for each channel and update the initial index for each channel on the values buffer
              calcBuffer();
              //Serial.println("saiu calcBuffer");
 /*            Serial.print("=> Canais: ");
