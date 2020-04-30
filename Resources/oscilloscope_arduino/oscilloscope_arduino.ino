@@ -60,7 +60,7 @@ char unit_ = 'm'; // unit : m = millisecond, u = microsecond
 boolean various = false; // v = several
 boolean once = false;    // u = onece
 boolean flow = false; // f = data flow (sends each reading without saving it in memory) : speed limited by the 115200 serial
-unsigned long dtReal, tIni, tFim; // Variables for keeping the end time counter for flow state
+unsigned long dtReal, tIni, final_counter_time; // Variables for keeping the end time counter for flow state
 char triggered_channel = 'x'; // Variable that sets what channel is triggered : '0', '1', '2', '3' (trigger channel), 'x' = no trigger
 
 
@@ -279,11 +279,11 @@ void readSerial(){
              
              if (unit_=='u'){ // microsecond
                tIni = micros(); 
-               tFim = tIni + dt;
+               final_counter_time = tIni + dt;
              }
              else{ // millisecond
                tIni = millis(); 
-               tFim = tIni + dt;
+               final_counter_time = tIni + dt;
              }
           }
 
@@ -449,7 +449,7 @@ void printConfig(){
    Serial.print(">? pwmPon="); Serial.print(pwmPon); Serial.println("%");
 }
 
-unsigned long microsOuMillis(){
+unsigned long microsOrMillis(){
    if (unit_=='u'){
       return micros();
    } 
@@ -458,97 +458,67 @@ unsigned long microsOuMillis(){
    }
 }
 
-
 boolean trigger(){
   //-- look for voltage greater than zero in triggered_channel ----
   //-- if once = true then it waits indefinitely
-  //-- if once = false then wait until time tFim (q * dt)
+  //-- if once = false then wait until time final_counter_time (q * dt)
   //-- the triggered_channel variable indicates which channel will trigger: 0, 1, 2 or 3
-  unsigned long tFim; // Final time counter
-  int v1=0,v2=0; 
-  //int c1=0, c2=0;
-  boolean achou=false;
-    tFim=microsOuMillis()+q*dt;
-    // dispara na subida do valor trigger_voltage+10
-    //fica lendo a tensão enquanto for maior que trigger_voltage 
-    //   E tempo menor que tFim
-    do{
-      v1=analogRead(triggered_channel-'0');
-      //c1++;
-    }while (v1>trigger_voltage && microsOuMillis()<tFim);
-  //  while (v1=analogRead(triggered_channel-'0')>0 && microsOuMillis()<tFim){c1++;}
-    if (v1<=trigger_voltage){
-      tFim=microsOuMillis()+q*dt;
-      //fica lendo a tensão enquanto for menor ou igual a 10+trigger_voltage
-      // E tempo menor que tFim
-      do{
-        v2=analogRead(triggered_channel-'0');
-        //c2++;
-      }while(v2<=10+trigger_voltage && microsOuMillis()<tFim);
-      //while (v2=analogRead(triggered_channel-'0')<=0 && microsOuMillis()<tFim){c2++;}
-      if (v2>10+trigger_voltage){ 
-        achou=true;
-      }
-      //Serial.print("v1="); Serial.print(v1); Serial.print(" v2=");Serial.println(v2);
-      //Serial.print("c1=");Serial.print(c1);Serial.print(" c2=");Serial.println(c2);
-    }
-    return achou;
-}
-
-    
-void sendVariousSamples(){
-
-/*  
-  // enviar quais canais serao enviados. ex: >ch=1<\t>3<\t>
-  Serial.print(">channels_on="); Serial.print(channels_on); Serial.print("\t");
-  for (int k=0; k<4; k++){
-    if (channels_state[k]){Serial.print(k); Serial.print("\t");}    
-  }
-  Serial.println("");
-
-  //enviar os valores dos canais
-  for (int k=0; k<q; k++){
-    Serial.print(">v="); Serial.print(k); Serial.print("\t");
-    if (channels_state[0]) {Serial.print(chs_init_pos_list[0]+k); Serial.print("\t");}
-    if (channels_state[1]) {Serial.print(chs_init_pos_list[1]+k); Serial.print("\t");}
-    if (channels_state[2]) {Serial.print(chs_init_pos_list[2]+k); Serial.print("\t");}
-    if (channels_state[3]) {Serial.print(chs_init_pos_list[3]+k); Serial.print("\t");}
-    Serial.println("");
-  }
-
   
-  return;
-
+  unsigned long final_counter_time; // Final time of the counter
+  int v1=0, v2=0; 
+  boolean found=false;
+  final_counter_time = microsOrMillis() + q * dt;
+  
+  /* Triggers on the rising edge of the reading, because of <trigger_voltage+10>, as long as the reading 
+  is greater than <trigger_voltage> And time less than final_counter_time, You can set the trigger to a 
+  falling edge by changing <trigger_voltage+10> to <trigger_voltage-10>
   */
-
+  do{
+    v1 = analogRead(triggered_channel-'0');
+  }
+  while (v1 > trigger_voltage && microsOrMillis() < final_counter_time);
+  if (v1 <= trigger_voltage){
+    final_counter_time = microsOrMillis() + q * dt;
+    do{
+      v2 = analogRead(triggered_channel-'0');
+    }
+    while(v2 <= 10+trigger_voltage && microsOrMillis()<final_counter_time);
+    if (v2 > 10+trigger_voltage){ 
+      found=true;
+    }
+  }
+  return found;
+}
+ 
+void sendVariousSamples(){
   
-  unsigned long tFim; // contador do tempo Final
-  unsigned long tTotalReal; // tempo Total da leitura dos valores.
-    if (triggered_channel>='0' && triggered_channel<='3'){
-      //Serial.print("triggered_channel=");Serial.println(triggered_channel);
-      Serial.print("trigger="); Serial.println(trigger());
-     }
-    tTotalReal=microsOuMillis();
+  unsigned long final_counter_time; // Final time counter
+  unsigned long tTotalReal; // Total time of reading the values.
+  
+  if (triggered_channel >= '0' && triggered_channel <= '3'){
+    Serial.print("trigger="); Serial.println(trigger());
+   }
+  tTotalReal=microsOrMillis();
 
-    for (int k=0; k<q; k++){
-      tFim=microsOuMillis()+dt; 
+  for (int k=0; k<q; k++){
+    final_counter_time=microsOrMillis()+dt; 
 /*
-      if (channels_state[0]) {v0[k]=analogRead(A0);}
-      if (channels_state[1]) {v1[k]=analogRead(A1);}
-      if (channels_state[2]) {v2[k]=analogRead(A2);}
-      if (channels_state[3]) {v3[k]=analogRead(A3);}
+    if (channels_state[0]) {v0[k]=analogRead(A0);}
+    if (channels_state[1]) {v1[k]=analogRead(A1);}
+    if (channels_state[2]) {v2[k]=analogRead(A2);}
+    if (channels_state[3]) {v3[k]=analogRead(A3);}
 */
 
-      if (channels_state[0]) {values_buffer[chs_init_pos_list[0]+k] = analogRead(A0);}
-      if (channels_state[1]) {values_buffer[chs_init_pos_list[1]+k] = analogRead(A1);}
-      if (channels_state[2]) {values_buffer[chs_init_pos_list[2]+k] = analogRead(A2);}
-      if (channels_state[3]) {values_buffer[chs_init_pos_list[3]+k] = analogRead(A3);}
-      while (microsOuMillis()<tFim){}
-    }
+    if (channels_state[0]) {values_buffer[chs_init_pos_list[0]+k] = analogRead(A0);}
+    if (channels_state[1]) {values_buffer[chs_init_pos_list[1]+k] = analogRead(A1);}
+    if (channels_state[2]) {values_buffer[chs_init_pos_list[2]+k] = analogRead(A2);}
+    if (channels_state[3]) {values_buffer[chs_init_pos_list[3]+k] = analogRead(A3);}
+    while (microsOrMillis()<final_counter_time){}
+  }
 
-    
-    tTotalReal=microsOuMillis()-tTotalReal; // total de tempo para ler todas as amostras
-    dtReal=tTotalReal/q; // calcular o tempo médio de cada leitura
+  
+  tTotalReal=microsOrMillis()-tTotalReal; // total de tempo para ler todas as amostras
+  dtReal=tTotalReal/q; // calcular o tempo médio de cada leitura
   Serial.println();
   Serial.print(">q="); Serial.println(q);
   Serial.print(">dt="); Serial.print(dt); Serial.print(unit_); Serial.println("s");
@@ -605,9 +575,9 @@ void sendFlowSamples(){
   int v0, v1, v2, v3; // guarda os valores das leituras
   //byte v0, v1, v2, v3; // guarda os valores das leituras
   boolean leu=false;
-    if (microsOuMillis()>=tFim){
-      dtReal=microsOuMillis()-tIni;
-      tIni=microsOuMillis(); tFim=tIni+dt;
+    if (microsOrMillis()>=final_counter_time){
+      dtReal=microsOrMillis()-tIni;
+      tIni=microsOrMillis(); final_counter_time=tIni+dt;
       if (channels_state[0]) {v0=analogRead(A0);}
       if (channels_state[1]) {v1=analogRead(A1);}
       if (channels_state[2]) {v2=analogRead(A2);}
